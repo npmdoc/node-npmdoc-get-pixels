@@ -1,0 +1,157 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/scijs/get-pixels#readme">get-pixels (v3.3.0)</a>
+</h1>
+<h4>Reads the pixels of an image as an ndarray</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.get-pixels">module get-pixels</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.get-pixels.get-pixels">
+            function <span class="apidocSignatureSpan"></span>get-pixels
+            <span class="apidocSignatureSpan">(url, type, cb)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.get-pixels" id="apidoc.module.get-pixels">module get-pixels</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.get-pixels.get-pixels" id="apidoc.element.get-pixels.get-pixels">
+        function <span class="apidocSignatureSpan"></span>get-pixels
+        <span class="apidocSignatureSpan">(url, type, cb)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function getPixels(url, type, cb) {
+  if(!cb) {
+    cb = type
+    type = ''
+  }
+  if(Buffer.isBuffer(url)) {
+    if(!type) {
+      cb(new Error('Invalid file type'))
+      return
+    }
+    doParse(type, url, cb)
+  } else if(url.indexOf('data:') === 0) {
+    try {
+      var buffer = parseDataURI(url)
+      if(buffer) {
+        process.nextTick(function() {
+          doParse(type || buffer.mimeType, buffer.data, cb)
+        })
+      } else {
+        process.nextTick(function() {
+          cb(new Error('Error parsing data URI'))
+        })
+      }
+    } catch(err) {
+      process.nextTick(function() {
+        cb(err)
+      })
+    }
+  } else if(url.indexOf('http://') === 0 || url.indexOf('https://') === 0) {
+    request({url:url, encoding:null}, function(err, response, body) {
+      if(err) {
+        cb(err)
+        return
+      }
+
+      type = type;
+      if(!type){
+        if(response.getHeader !== undefined){
+	  type = response.getHeader('content-type');
+	}else if(response.headers !== undefined){
+	  type = response.headers['content-type'];
+	}
+      }
+      if(!type) {
+        cb(new Error('Invalid content-type'))
+        return
+      }
+      doParse(type, body, cb)
+    })
+  } else {
+    fs.readFile(url, function(err, data) {
+      if(err) {
+        cb(err)
+        return
+      }
+      type = type || mime.lookup(url)
+      if(!type) {
+        cb(new Error('Invalid file type'))
+        return
+      }
+      doParse(type, data, cb)
+    })
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
